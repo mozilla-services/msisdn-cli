@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals, print_function
+
 import pkg_resources
 
 #: Module version, as defined in PEP-0396.
@@ -111,7 +113,7 @@ def main():
     try:
         r.raise_for_status()
     except:
-        print(r.content)
+        print(url, r.content)
         raise
 
     discover = r.json()
@@ -122,7 +124,7 @@ def main():
     try:
         r.raise_for_status()
     except:
-        print(r.content)
+        print(url, r.content)
         raise
 
     register = r.json()
@@ -151,7 +153,7 @@ def main():
         try:
             r.raise_for_status()
         except:
-            print(r.content)
+            print(url, r.content)
             raise
 
     # 3. If MOMT Flow
@@ -174,7 +176,7 @@ def main():
     try:
         r.raise_for_status()
     except:
-        print(r.content)
+        print(url, r.content)
         raise
 
     # 6. Print out the certificate
@@ -189,13 +191,14 @@ def main():
     try:
         r.raise_for_status()
     except:
-        print(r.content)
+        print(url, r.content)
         raise
 
     sign = r.json()
     cert = sign["cert"]
     info = json.loads(decode_bytes(cert.split('.')[1]).decode("utf-8"))
     info["publicKey"] = "<stripped>"
+    info["public-key"] = "<stripped>"
     info["pubkey"] = "<stripped>"
     print("Verified: %s" % json.dumps(info, indent=2, sort_keys=True))
 
