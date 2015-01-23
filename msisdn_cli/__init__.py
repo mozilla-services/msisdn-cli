@@ -93,7 +93,7 @@ ERROR_EXPLAINATION = """Here are the error messages you can get:
 
 def main():
     arguments = docopt(HELP)
-    host = arguments["--host"]
+    host = arguments["--host"].rstrip('/')
     headers = {'content-type': 'application/json'}
 
     if arguments["--version"]:
