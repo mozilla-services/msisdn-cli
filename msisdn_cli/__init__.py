@@ -21,8 +21,8 @@ from browserid.tests.support import get_keypair
 HELP = """This program helps you test a MSISDN Gateway server from the CLI.
 
 Usage:
-  msisdn-cli --host=<host> --mcc=<mcc> [(--audience=<audience> (--dry-run | --login-endpoint=<endpoint>))] [(--data=<data> | --json=<json>)] [--no-ssl-verify] [options]
-  msisdn-cli --host=<host> --mcc=<mcc> [(--audience=<audience> --dry-run --login-endpoint=<endpoint>)] [(--data=<data> | --json=<json>)] [--no-ssl-verify] [options]
+  msisdn-cli --host=<host> --mcc=<mcc> [(--audience=<audience> (--dry-run | --login-endpoint=<endpoint>))] [(--data=<data> | --json=<json>)] [--insecure] [options]
+  msisdn-cli --host=<host> --mcc=<mcc> [(--audience=<audience> --dry-run --login-endpoint=<endpoint>)] [(--data=<data> | --json=<json>)] [--insecure] [options]
   msisdn-cli -h | --help
   msisdn-cli --version
 
@@ -39,7 +39,7 @@ Options:
   --mnc=<mnc>            Mobile Network Code (2 or 3 digits) ie: 07
   -n --msisdn=<msisdn>   The MSISDN number you want to validate.
   -v, --verbose          Display the assertion
-  --no-ssl-verify        Allow wrong SSL configuration
+  -k, --insecure         Allow wrong SSL configuration
 
 
   BrowserID Service Provider request configuration
@@ -101,7 +101,7 @@ def main():
         sys.exit(0)
 
     verify = True
-    if arguments["--no-ssl-verify"]:
+    if arguments["--insecure"]:
         verify = False
 
     # 1. Start the discover
