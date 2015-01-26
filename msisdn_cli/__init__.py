@@ -23,8 +23,8 @@ from browserid.tests.support import get_keypair
 HELP = """This program helps you test a MSISDN Gateway server from the CLI.
 
 Usage:
-  msisdn-cli --host=<host> --mcc=<mcc> [(--audience=<audience> (--dry-run | --login-endpoint=<endpoint>))] [(--data=<data> | --json=<json>)] [options]
-  msisdn-cli --host=<host> --mcc=<mcc> [(--audience=<audience> --dry-run --login-endpoint=<endpoint>)] [(--data=<data> | --json=<json>)] [options]
+  msisdn-cli --host=<host> --mcc=<mcc> [(--audience=<audience> (--dry-run | --login-endpoint=<endpoint>))] [(--data=<data> | --json=<json>)] [--insecure] [options]
+  msisdn-cli --host=<host> --mcc=<mcc> [(--audience=<audience> --dry-run --login-endpoint=<endpoint>)] [(--data=<data> | --json=<json>)] [--insecure] [options]
   msisdn-cli -h | --help
   msisdn-cli --version
 
@@ -41,6 +41,7 @@ Options:
   --mnc=<mnc>            Mobile Network Code (2 or 3 digits) ie: 07
   -n --msisdn=<msisdn>   The MSISDN number you want to validate.
   -v, --verbose          Display the assertion
+  -k, --insecure         Allow wrong SSL configuration
 
 
   BrowserID Service Provider request configuration
@@ -94,12 +95,16 @@ ERROR_EXPLAINATION = """Here are the error messages you can get:
 
 def main():
     arguments = docopt(HELP)
-    host = arguments["--host"]
+    host = arguments["--host"].rstrip('/')
     headers = {'content-type': 'application/json'}
 
     if arguments["--version"]:
         print("msisdn-cli %s" % __version__)
         sys.exit(0)
+
+    verify = True
+    if arguments["--insecure"]:
+        verify = False
 
     # 1. Start the discover
     url = "%s/discover" % host
@@ -109,7 +114,8 @@ def main():
     if arguments["--msisdn"] is not None:
         discover_args["msisdn"] = arguments["--msisdn"]
 
-    r = requests.post(url, json.dumps(discover_args), headers=headers)
+    r = requests.post(url, json.dumps(discover_args),
+                      headers=headers, verify=verify)
     try:
         r.raise_for_status()
     except:
@@ -120,7 +126,7 @@ def main():
 
     # 1.1 Register
     url = "%s/register" % host
-    r = requests.post(url, headers=headers)
+    r = requests.post(url, headers=headers, verify=verify)
     try:
         r.raise_for_status()
     except:
@@ -149,7 +155,7 @@ def main():
             "shortVerificationCode": True
         }
         r = requests.post(url, json.dumps(verify_args),
-                          auth=hawk_auth, headers=headers)
+                          auth=hawk_auth, headers=headers, verify=verify)
         try:
             r.raise_for_status()
         except:
@@ -172,7 +178,7 @@ def main():
     # 5. Verify the code
     url = "%s/sms/verify_code" % host
     r = requests.post(url, json.dumps({"code": code.strip()}),
-                      auth=hawk_auth, headers=headers)
+                      auth=hawk_auth, headers=headers, verify=verify)
     try:
         r.raise_for_status()
     except:
@@ -187,7 +193,7 @@ def main():
         "duration": 86400  # One day
     }
     r = requests.post(url, json.dumps(sign_args),
-                      auth=hawk_auth, headers=headers)
+                      auth=hawk_auth, headers=headers, verify=verify)
     try:
         r.raise_for_status()
     except:
@@ -248,7 +254,7 @@ def main():
                 headers["Content-Type"] = "application/json"
                 headers["Accept"] = "application/json"
             r = requests.post(arguments["--login-endpoint"], data=data,
-                              headers=headers)
+                              headers=headers, verify=verify)
 
             # Try to extract an Hawk sessionToken from the response.
             sessionToken = None
