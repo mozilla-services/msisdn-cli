@@ -138,8 +138,11 @@ def main():
                          server_url=host)
     hawkId = hawk_auth.credentials["id"]
 
+    method = discover['verificationMethods'][0]
+    mtSender = discover['verificationDetails'][method]["mtSender"]
+
     # 2. If MT Flow
-    if discover['verificationMethods'][0] == "sms/mt":
+    if method == "sms/mt":
         # 2.1 If no MSISDN, ask the MSISDN
         if arguments["--msisdn"] is None:
             msisdn = input("Please enter your MSISDN number (ie +123456789): ")
@@ -147,6 +150,7 @@ def main():
             msisdn = arguments["--msisdn"]
 
         # 2.2 Start the registration
+
         print("MT Flow for %s" % msisdn)
         url = "%s/sms/mt/verify" % host
         verify_args = {
@@ -172,7 +176,7 @@ def main():
 
     # 4. Ask for the code
     code = input(
-        "Please enter the code that you will get by SMS: "
+        "Please enter the code that you will get by SMS from %s: " % mtSender
     )
 
     # 5. Verify the code
