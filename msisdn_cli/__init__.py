@@ -138,8 +138,15 @@ def main():
                          server_url=host)
     hawkId = hawk_auth.credentials["id"]
 
+    method = discover['verificationMethods'][0]
+
+    try:
+        mtSender = discover['verificationDetails'][method]["mtSender"]
+    except KeyError:
+        mtSender = ''
+
     # 2. If MT Flow
-    if discover['verificationMethods'][0] == "sms/mt":
+    if method == "sms/mt":
         # 2.1 If no MSISDN, ask the MSISDN
         if arguments["--msisdn"] is None:
             msisdn = input("Please enter your MSISDN number (ie +123456789): ")
@@ -172,7 +179,7 @@ def main():
 
     # 4. Ask for the code
     code = input(
-        "Please enter the code that you will get by SMS: "
+        "Please enter the code that you will get by SMS from %s: " % mtSender
     )
 
     # 5. Verify the code
