@@ -2,11 +2,11 @@ CHANGELOG
 =========
 
 
-0.1.0 (unreleased)
-------------------
+1.0 (2015-02-03)
+----------------
 
+ - Detect verification method for a given MCC/MNC and MSISDN
+ - Run the detected flow and display mtSender information.
  - Get a certificate from a msisdn-gateway server
  - Create a BrowserID assertion for a Service Provider audience
- - Build a cURL command to logs with the assertion on the Service Provider
  - Run a requests on the Service Provider login Endpoint
- - If possible try to get back the Hawk Session Token
