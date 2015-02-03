@@ -139,7 +139,11 @@ def main():
     hawkId = hawk_auth.credentials["id"]
 
     method = discover['verificationMethods'][0]
-    mtSender = discover['verificationDetails'][method]["mtSender"]
+
+    try:
+        mtSender = discover['verificationDetails'][method]["mtSender"]
+    except KeyError:
+        mtSender = ''
 
     # 2. If MT Flow
     if method == "sms/mt":
@@ -150,7 +154,6 @@ def main():
             msisdn = arguments["--msisdn"]
 
         # 2.2 Start the registration
-
         print("MT Flow for %s" % msisdn)
         url = "%s/sms/mt/verify" % host
         verify_args = {
